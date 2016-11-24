@@ -9,8 +9,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.7.7",
     "express": "^4.14.0",
+    "firebase-admin": "^4.0.3",
     "fs": "0.0.1-security",
-    "socket.io": "^1.6.0"
+    "socket.io": "^1.6.0",
+    "socket.io-stream": "^0.9.1",
+    "sox": "^0.1.0",
+    "sox-audio": "^0.3.0",
+    "wav": "^1.0.1"
   }
 }
