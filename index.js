@@ -29,7 +29,7 @@ var credentials = {
 };
 
 
-const test_fille_name = "2outfile_name_wav.wav";
+let test_fille_name = "";
 const test_fille_local_path = "./public/audio/";
 
 const serverPort = 3000;
@@ -95,6 +95,8 @@ io.on('connection', (socket)=> {
 	ss(socket).on('audio_record_start', (stream, data)=>{
     console.log("audio record start socket id=" + socket.id);
     console.log(data);
+    const cache_buster = new Date();
+    test_fille_name = "test_"+ cache_buster.getTime() + ".wav";
     const file_writer = new wav.FileWriter(
       test_fille_local_path + test_fille_name,
       {channels:1,
@@ -106,7 +108,10 @@ io.on('connection', (socket)=> {
 
 	socket.on('audio_record_end', (data)=>{
     console.log(data);
-    upload_file();
+    setTimeout(()=>{
+      upload_file();
+    },5000)
+    
   })
 
 });
@@ -141,7 +146,7 @@ const save_AudioInfo_onFirebase = (filename)=>{
 
   const file_path = config.S3_audio_url + "/" + config.BucketName + "/" + filename;
   const database = firebase_admin.database();
-  database.ref("test").set(filename);
+  database.ref("hackerthon-ipt/record/audio").set(file_path);
 
 }
 
