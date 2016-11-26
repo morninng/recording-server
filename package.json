@@ -13,6 +13,7 @@
     "express": "^4.14.0",
     "firebase-admin": "^4.0.3",
     "fs": "0.0.1-security",
+    "google-translate": "^1.0.7",
     "socket.io": "^1.6.0",
     "socket.io-stream": "^0.9.1",
     "sox": "^0.1.0",

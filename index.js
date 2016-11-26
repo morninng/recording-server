@@ -8,8 +8,10 @@ const sox = require('sox');
 const SoxCommand = require('sox-audio');
 const firebase_admin = require("firebase-admin");
 const serviceAccount = require("./secret/mixidea-91a20-firebase-adminsdk.json");
-
 const config = require('./config/mixidea.conf');
+
+const api_key = config.google_translate_apikey;
+const googleTranslate = require('google-translate')(api_key);
 
 firebase_admin.initializeApp({
   credential: firebase_admin.credential.cert("secret/mixidea-91a20-firebase-adminsdk.json"),
@@ -21,17 +23,23 @@ const AWS = require('aws-sdk');
 AWS.config.update({accessKeyId: config.AwsKeyId, secretAccessKey: config.SecretKey});
 s3 = new AWS.S3({params: {Bucket:config.BucketName} });
 
+var credentials = {
+  key: fs.readFileSync('./cert/mixidea.key'),
+  cert: fs.readFileSync('./cert/mixidea.cert')
+};
+
 
 const test_fille_name = "2outfile_name_wav.wav";
 const test_fille_local_path = "./public/audio/";
-//const test_fille_aws_path = "event_id/role/";
 
 const serverPort = 3000;
-const serverHost = "127.0.0.1";
+//const serverPort = 80;
+/*const serverHost = "127.0.0.1";*/
 
 const app = express();
-const httpServer = http.createServer(app);
-const server = httpServer.listen(serverPort, serverHost, ()=> {
+//const httpServer = http.createServer(app);
+const httpServer = https.createServer(credentials, app);
+const server = httpServer.listen(serverPort, /* serverHost,*/ ()=> {
   var host = server.address().address;
   var port = server.address().port;
   console.log('Example app listening at http://%s:%s', host, port);
@@ -46,6 +54,30 @@ app.get('/', (req, res)=> {
   console.log(test);
   res.send('Hello World!');
 });
+
+app.get('/translate', (req,res)=>{
+  console.log("translation is called");
+  const querystring = req.query;
+  if(!querystring || !querystring.text || !querystring.target_lang){
+    return;
+  }
+  
+  console.log(querystring.text);
+  googleTranslate.translate(querystring.text, querystring.target_lang, (err, translation)=>{
+
+    console.log(translation.translatedText);
+    res.header('Access-Control-Allow-Origin', '*');
+    res.status(200).send(translation.translatedText);
+
+    if(querystring.firebase_ref){
+      const database = firebase_admin.database();
+      database.ref(querystring.firebase_ref).set(translation.translatedText);
+    }
+
+  })
+
+})
+
 
 
 const io = require('socket.io').listen(server);

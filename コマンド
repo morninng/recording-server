@@ -1,0 +1,19 @@
+
+
+ssh -i "/home/yuta/.ssh/mixidea_key.pem" ubuntu@ec2-54-144-39-186.compute-1.amazonaws.com
+
+
+
+sudo rsync -avz -e "ssh -i /home/yuta/.ssh/mixidea_key.pem" --exclude='node_modules/*' /home/yuta/development/Angular2/recording-server/* ubuntu@ec2-54-144-39-186.compute-1.amazonaws.com:/home/ubuntu/source
+
+
+sudo rsync -avz -e "ssh -i /home/yuta/.ssh/mixidea_key.pem"
+     --exclude='node_modules/*'
+      /home/yuta/development/Angular2/recording-server/*
+       ubuntu@ec2-54-144-39-186.compute-1.amazonaws.com:/home/ubuntu/source
+
+https://recording.mixidea.org:3000/
+でアクセス可能。
+
+lsof -i:3000
+kill XXXXX
