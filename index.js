@@ -23,22 +23,22 @@ const AWS = require('aws-sdk');
 AWS.config.update({accessKeyId: config.AwsKeyId, secretAccessKey: config.SecretKey});
 s3 = new AWS.S3({params: {Bucket:config.BucketName} });
 
-var credentials = {
-  key: fs.readFileSync('./cert/mixidea.key'),
-  cert: fs.readFileSync('./cert/mixidea.cert')
-};
+// var credentials = {
+//   key: fs.readFileSync('./cert/mixidea.key'),
+//   cert: fs.readFileSync('./cert/mixidea.cert')
+// };
 
 
 let test_fille_name = "";
 const test_fille_local_path = "./public/audio/";
 
-const serverPort = 3000;
-//const serverPort = 80;
+//const serverPort = 3000;
+const serverPort = 80;
 /*const serverHost = "127.0.0.1";*/
 
 const app = express();
-//const httpServer = http.createServer(app);
-const httpServer = https.createServer(credentials, app);
+const httpServer = http.createServer(app);
+//const httpServer = https.createServer(credentials, app);
 const server = httpServer.listen(serverPort, /* serverHost,*/ ()=> {
   var host = server.address().address;
   var port = server.address().port;
