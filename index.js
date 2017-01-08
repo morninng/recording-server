@@ -1,4 +1,5 @@
 const express = require('express');
+var path = require('path');
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
@@ -10,8 +11,6 @@ const firebase_admin = require("firebase-admin");
 const serviceAccount = require("./secret/mixidea-91a20-firebase-adminsdk.json");
 const config = require('./config/mixidea.conf');
 
-const api_key = config.google_translate_apikey;
-const googleTranslate = require('google-translate')(api_key);
 
 firebase_admin.initializeApp({
   credential: firebase_admin.credential.cert("secret/mixidea-91a20-firebase-adminsdk.json"),
@@ -25,7 +24,7 @@ log4js.configure({
         {
             "type": "dateFile",
             "category": "request",
-            "filename": "logs/request.log",
+            "filename": "server_log/request.log",
             "pattern": "-yyyy-MM-dd"            
         },
 
@@ -37,17 +36,14 @@ const AWS = require('aws-sdk');
 AWS.config.update({accessKeyId: config.AwsKeyId, secretAccessKey: config.SecretKey});
 s3 = new AWS.S3({params: {Bucket:config.BucketName} });
 
-var credentials = {
-  key: fs.readFileSync('./cert/server.key'),
-  cert: fs.readFileSync('./cert/mysslserver.crt')
-};
 
+/*
 let test_fille_name = "";
 const test_fille_local_path = "./public/audio/";
-
+*/
 //const serverPort = 3000;
 const serverPort = 80;
-const serverHost = "127.0.0.1";
+//const serverHost = "127.0.0.1";
 
 const app = express();
 //const httpServer = https.createServer(credentials,app);
@@ -63,45 +59,24 @@ test_socket_count = 0;
 GlobalInfo = {}
 
 app.get('/', (req, res)=> {
-  test++;
-  console.log(test);
+	console.log('root is called'); 
   res.send('Hello World recording server!');
 });
 
-app.get('/translate', (req,res)=>{
-  console.log("translation is called");
-  const querystring = req.query;
-  if(!querystring || !querystring.text || !querystring.target_lang){
-    return;
-  }
-  
-  console.log(querystring.text);
-  googleTranslate.translate(querystring.text, querystring.target_lang, (err, translation)=>{
 
-    console.log(translation.translatedText);
-    res.header('Access-Control-Allow-Origin', '*');
-    res.status(200).send(translation.translatedText);
+app.use(express.static(path.join(__dirname, 'public')));
 
-    if(querystring.firebase_ref){
-      const database = firebase_admin.database();
-      database.ref(querystring.firebase_ref).set(translation.translatedText);
-    }
-
-  })
-
-})
-
+const translate = require("./routes/translate");
+const client_log = require("./routes/client_log");
+app.use('/translate', translate);
+app.use('/client_log', client_log);
 
 
 const io = require('socket.io').listen(server);
 io.sockets.setMaxListeners(Infinity);
 
-const test_io = io.of('/test')
+
 const mixidea_io = io.of('/mixidea')
-
-
-
-
 mixidea_io.on('connection',(socket)=>{
 
   console.log("user connect to mixidea io : ", socket.id);
@@ -225,6 +200,7 @@ mixidea_io.on('connection',(socket)=>{
 
 
 
+//	const test_io = io.of('/test')
 // test_io.on('connection', (socket)=> {
 //   console.log("user connected to test io", socket.id);
 //   test_socket_count++;
