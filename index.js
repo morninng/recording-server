@@ -24,7 +24,7 @@ log4js.configure({
         {
             "type": "dateFile",
             "category": "request",
-            "filename": "server_log/request.log",
+            "filename": "./public/log/server_log.log",
             "pattern": "-yyyy-MM-dd"            
         },
 
