@@ -8,7 +8,9 @@ var router = express.Router();
 
 /* GET users listing. */
 
-const header_format =  {headers:["timestamp","event_id","user_id","user_name","level","file_name","tech",'module','type','element','message','browser','useragent']}
+const csv_writer_option =  {
+    headers:["timestamp","event_id","user_id","user_name","level","file_name","tech",'module','type','element','message','browser','useragent'],
+    separator: '\t'}
 let global_logger = null;
 
 router.get('/log_test', function (req, res) {
@@ -20,7 +22,7 @@ router.get('/', function(req, res, next) {
     console.log("log is called");
     const query_obj = req.query;
     if(!global_logger){
-        global_logger = csvWriter(header_format);
+        global_logger = csvWriter(csv_writer_option);
         global_logger.pipe(fs.createWriteStream('./public/log/client_log.txt'));
     }
     console.log(query_obj);
