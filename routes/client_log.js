@@ -9,13 +9,21 @@ var router = express.Router();
 /* GET users listing. */
 
 const csv_writer_option =  {
-    headers:["timestamp","event_id","user_id","user_name","level","file_name","tech",'module','type','element','message','browser','useragent'],
+    headers:["timestamp","event_id","user_id","user_name","level","file_name","tech",'module','type','element','message','send_type','browser','useragent'],
     separator: '\t'}
 let global_logger = null;
 
 router.get('/log_test', function (req, res) {
     res.send('log server confirmation');
 })
+
+router.get('/reflesh', function (req, res) {
+    global_logger = csvWriter(csv_writer_option);
+    global_logger.pipe(fs.createWriteStream('./public/log/client_log.txt'));
+    res.send('csv data has been refleshed');
+})
+
+
 
 
 router.get('/', function(req, res, next) {
