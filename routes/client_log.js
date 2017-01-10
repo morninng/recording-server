@@ -9,7 +9,7 @@ var router = express.Router();
 /* GET users listing. */
 
 const csv_writer_option =  {
-    headers:["timestamp","event_id","user_id","user_name","level","file_name","tech",'module','type','element','message','send_type','browser','useragent'],
+    headers:["level","user_name","file_name",'message','type',"server_time","client_time","event_id","user_id","tech",'module','element','send_type','browser','useragent'],
     separator: '\t'}
 let global_logger = null;
 
@@ -34,14 +34,16 @@ router.get('/', function(req, res, next) {
         global_logger.pipe(fs.createWriteStream('./public/log/client_log.txt'));
     }
     console.log(query_obj);
-    if(query_obj['timestamp']){
-        const timestamp = new Date(query_obj['timestamp']);
-        query_obj['timestamp'] = timestamp.toISOString();
-    }
+
+    // if(query_obj['timestamp']){
+    //     const timestamp = new Date(query_obj['timestamp']);
+    //     query_obj['timestamp'] = timestamp.toISOString();
+    // }
 
     var agent = useragent.parse(req.headers['user-agent']);
     query_obj['useragent'] = req.headers['user-agent']
     query_obj['browser'] = agent.toAgent();
+    query_obj['server_time'] = new Date().toUTCString();
 
     global_logger.write(query_obj)
     res.header({"Access-Control-Allow-Origin":"*"})
