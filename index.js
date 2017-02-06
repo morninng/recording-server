@@ -52,6 +52,7 @@ const server = httpServer.listen(serverPort, /* serverHost,*/ ()=> {
   var host = server.address().address;
   var port = server.address().port;
   console.log('Example app listening at http://%s:%s', host, port);
+  loggerRequest.info('Example app listening at http://%s:%s', host, port);
 });
 
 test = 0;
@@ -59,7 +60,7 @@ test_socket_count = 0;
 GlobalInfo = {}
 
 app.get('/', (req, res)=> {
-	console.log('root is called'); 
+  console.log('root is called'); 
   res.send('Hello World recording server!');
 });
 
@@ -80,8 +81,7 @@ const mixidea_io = io.of('/mixidea')
 mixidea_io.on('connection',(socket)=>{
 
   console.log("user connect to mixidea io : ", socket.id);
-  test_socket_count++;
-  console.log(test_socket_count);
+  loggerRequest.info("user connect to mixidea io : ", socket.id);
 
   socket.on('disconnect', function(){
     console.log("user disconnected socket id=" + socket.id);

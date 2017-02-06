@@ -33,7 +33,6 @@ router.get('/', function(req, res, next) {
         global_logger = csvWriter(csv_writer_option);
         global_logger.pipe(fs.createWriteStream('./public/log/client_log.txt'));
     }
-    console.log(query_obj);
 
     // if(query_obj['timestamp']){
     //     const timestamp = new Date(query_obj['timestamp']);
@@ -44,6 +43,15 @@ router.get('/', function(req, res, next) {
     query_obj['useragent'] = req.headers['user-agent']
     query_obj['browser'] = agent.toAgent();
     query_obj['server_time'] = new Date().toUTCString();
+
+    for(let key in query_obj){
+        query_obj[key] = query_obj[key].replace(/\t/g,'');
+        query_obj[key] = query_obj[key].replace(/ ,/g,'');
+        query_obj[key] = query_obj[key].replace(/, /g,'');
+        query_obj[key] = query_obj[key].replace(/"/g,'');
+        query_obj[key] = query_obj[key].replace(/'/g,'');
+        query_obj[key] = "\"" + query_obj[key] + "\"";
+    }
 
     global_logger.write(query_obj)
     res.header({"Access-Control-Allow-Origin":"*"})
